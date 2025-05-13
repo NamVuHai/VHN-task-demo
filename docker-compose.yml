@@ -1,0 +1,96 @@
+version: "3.6"
+services:
+  db:
+    container_name: postgres
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: vhn
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: assignment-management
+    ports:
+      - "5433:5432"
+    networks:
+      - local-net
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL","pg_isready -U vhn -d assignment-management"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+  discovery:
+    build: ./assignment-discovery
+    ports:
+      - "8761:8761"
+    networks:
+      - local-net
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: wget --quiet --tries=1 --spider http://localhost:8761 || exit 1z
+      interval: 30s
+      timeout: 10s
+      retries: 3
+  gateway:
+    build:
+      context: .
+      dockerfile: assignment-gateway/Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      - local-net
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka
+    depends_on:
+      discovery:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+  auth:
+    build:
+      context: .
+      dockerfile: assignment-auth/Dockerfile
+    ports:
+      - "8081:8081"
+    networks:
+      - local-net
+    environment:
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://discovery:8761/eureka
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5433/assignment-management
+      SPRING_DATASOURCE_USERNAME: vhn
+      SPRING_DATASOURCE_PASSWORD: mypassword
+    depends_on:
+      db:
+        condition: service_healthy
+      discovery:
+        condition: service_healthy
+  task_manager:
+    build:
+      context: .
+      dockerfile: assignment-task-manager/Dockerfile
+    ports:
+      - "8082:8082"
+    networks:
+      - local-net
+    environment:
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://discovery:8761/eureka
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5433/assignment-management
+      SPRING_DATASOURCE_USERNAME: vhn
+      SPRING_DATASOURCE_PASSWORD: mypassword
+    depends_on:
+      db:
+        condition: service_healthy
+      discovery:
+        condition: service_healthy
+
+
+networks:
+  local-net:
+
+volumes:
+  postgres-db:
+    driver: local
+
+
