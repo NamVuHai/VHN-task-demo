@@ -28,6 +28,6 @@ public class RefreshTokenApi implements CommonApi<RefreshTokenRequest, ResponseM
             LoginResponse response = new LoginResponse(jwtToken, request.getRefreshToken(), userId, formatter.format(date));
             return ResponseModel.ok("Refresh Token Success", response);
         }
-        throw new BusinessException(ErrorCode.CONFLICT, "Refresh token invalid");
+        throw new BusinessException("Refresh token invalid");
     }
 }

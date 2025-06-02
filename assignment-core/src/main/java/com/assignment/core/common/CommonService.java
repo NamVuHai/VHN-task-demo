@@ -28,17 +28,17 @@ public abstract class CommonService <E,ID,R extends CommonRepository<E,ID>>{
         try {
             return repo.findById(id);
         } catch (EntityNotFoundException entityNotFoundException) {
-            throw new BusinessException(ErrorCode.ENTITY_NOT_FOUND, entityNotFoundException.getMessage());
+            throw new BusinessException( entityNotFoundException.getMessage());
         }
     }
 
     @SneakyThrows
     public E getOrElseThrow(ID id) {
-        return get(id).orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND, notFoundMessage()));
+        return get(id).orElseThrow(() -> new BusinessException( notFoundMessage()));
     }
 
     public E getOrElseThrow(ID id, String message) {
-        return get(id).orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND, notFoundMessage()));
+        return get(id).orElseThrow(() -> new BusinessException(notFoundMessage()));
     }
 
     public E updateOnField(ID id , Consumer<E> fieldConsumer){

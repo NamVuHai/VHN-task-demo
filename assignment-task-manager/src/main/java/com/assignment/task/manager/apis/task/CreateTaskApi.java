@@ -44,7 +44,7 @@ public class CreateTaskApi implements CommonApi<CreateTaskRequest, ResponseModel
             feature.setDeadline(requestData.getDeadline());
             task = feature;
         }else{
-            throw new BusinessException(ErrorCode.INVALID_REQUEST_PARAMETER,"Invalid request parameter");
+            throw new BusinessException("Invalid request parameter");
         }
         task.setUser(user);
         task.setName(requestData.getName());

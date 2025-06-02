@@ -76,7 +76,7 @@ public class DeleteTaskApiTest {
     void execute_shouldThrowException_whenTaskNotFound() {
         // Arrange
         String taskId = "task-uuid-123";
-        when(taskService.deleteById(taskId)).thenThrow(new BusinessException(ErrorCode.ENTITY_NOT_FOUND,"Task not found"));
+        when(taskService.deleteById(taskId)).thenThrow(new BusinessException("Task not found"));
         // Act & Assert
         RuntimeException exception = assertThrows(BusinessException.class, () -> deleteTaskApi.execute(new CommonRequest(taskId)));
         assertEquals("Task not found", exception.getMessage());

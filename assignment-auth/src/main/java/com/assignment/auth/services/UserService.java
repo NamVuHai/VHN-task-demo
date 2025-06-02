@@ -15,7 +15,7 @@ public class UserService extends CommonService<UserEntity,String,UserRepository>
     }
 
     public UserEntity getUserByUserName(String userName){
-        return repo.findByUserName(userName).orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND,"User Not Found"));
+        return repo.findByUserName(userName).orElseThrow(() -> new BusinessException("User Not Found"));
     }
 
 

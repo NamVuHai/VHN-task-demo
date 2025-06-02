@@ -30,10 +30,10 @@ public class LoginApi implements CommonApi<UserLoginRequest, ResponseModel<Login
     public ResponseModel<LoginResponse> execute(UserLoginRequest request) {
         UserEntity user = userService.getUserByUserName(request.getUserName());
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new BusinessException(ErrorCode.CONFLICT, "User name or password invalid");
+            throw new BusinessException( "User name or password invalid");
         }
         if (Objects.nonNull(user.getIsDeleted()) && Boolean.TRUE.equals(user.getIsDeleted())) {
-            throw new BusinessException(ErrorCode.CONFLICT, "User name or password invalid");
+            throw new BusinessException( "User name or password invalid");
         }
         UserDetailCustom userDetails = new UserDetailCustom(user);
         String jwtToken = jwtTokenUtil.generateToken(userDetails);
